@@ -1,68 +1,131 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+useState() Hook Example
+========================
 
-## Available Scripts
+Quick Start
+------------
+```bash
+$ cd react-hooks
+$ yarn start
+$ open locahost:3000
+```
 
-In the project directory, you can run:
+Description
+-----------
+State are an essential part of React. They allow us to declare state variables that hold data that will be used in our app. With class components, state is usually defined like this:
 
-### `npm start`
+```javascript
+class Example extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    };
+  }
+}
+```          
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Before hooks, state was usually only used in a class component but as mentioned above, Hooks allows us to add state to a functional component.
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+Let's see an example below. Here, we'll be building a switch for a lightbulb SVG, which will change color depending on the value of the state. To do this, we'll be using the useState hook.
 
-### `npm test`
+Here's the complete code (and runnable example) -- we'll walk through what's going on below.
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```javascript
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 
-### `npm run build`
+import "./styles.css";
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+function LightBulb() {
+  let [light, setLight] = useState(0);
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+  const setOff = () => setLight(0);
+  const setOn = () => setLight(1);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  let fillColor = light === 1 ? "#ffbb73" : "#000000";
 
-### `npm run eject`
+  return (
+    <div className="App">
+      <div>
+        <LightbulbSvg fillColor={fillColor} />
+      </div>
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+      <button onClick={setOff}>Off</button>
+      <button onClick={setOn}>On</button>
+    </div>
+  );
+}
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+function LightbulbSvg(props) {
+  return (
+    <svg width="56px" 
+        height="90px" 
+        viewBox="0 0 56 90" 
+        version="1.1">
+      {/* 
+        svg definition truncated, but you 
+        can see the whole code example here:
+        https://codesandbox.io/s/mpnoljl19?from-embed
+        */}
+    </svg>
+  );
+}
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+const rootElement = document.getElementById("root");
+ReactDOM.render(<LightBulb />, rootElement);
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Our Component is a Function
+---------------------------
 
-## Learn More
+In the code block above, we start by importing `useState` from react. `useState` is a new way to use the capabilities that this.state would have offered.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Next, notice that this component is a function and not a class. Interesting!
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Reading and Writing State
+-------------------------
 
-### Code Splitting
+Within this function, we call useState to create a state variable:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+```javascript
+let [light, setLight] = useState(0);
+```
 
-### Analyzing the Bundle Size
+**useState is used to declare a state variable** and can be initialized with any type of value (unlike state in classes, which were required to be an object).
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+As seen above, we use destructuring on the return value of `useState`.
 
-### Making a Progressive Web App
+1. The first value, light in this case, is the current state (sort of like this.state) and
+1. The second value is a function used to update the state (first) value (like the traditional this.setState).
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+Next, we create two functions that each set the state to different values, 0 or 1.
 
-### Advanced Configuration
+```javascript
+const setOff = () => setLight(0);
+const setOn = () => setLight(1);
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+We then use these functions as event handlers to the buttons in the view:
 
-### Deployment
+```javascript
+<button onClick={setOff}>Off</button>
+<button onClick={setOn}>On</button>
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+React Tracks the State
+----------------------
 
-### `npm run build` fails to minify
+When the "On" button is pressed, setOn is called, which will call setLight(1). The call to setLight(1) **updates the value of light on the next render**. This can feel a bit magical, but what is happen is that **React is tracking the value of this variable** and it will pass in the new value when it re-renders this component.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Then, we use the current state (light) to determine whether the bulb should be "on" or not. That is, we set the fill color of the SVG depending on the value of light. If light is 0 (off), then the fillColor is set to #000000 (and if it's 1 (on), fillColor is set to #ffbb73).
+
+There are lots of Hooks
+-----------------------
+
+The code above covers only the useState hook, but there are many more! In the book, we also cover:
+
+1. useEffect Hook - for causing side-effects
+1. useContext Hook - for accessing context (without a class!)
+1. useRef Hook - for accessing a Ref
+1. How to make your own custom hooks and
+1. How to test your hooks
